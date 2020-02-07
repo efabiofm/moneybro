@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "756271737589",
+    "firebase_url": "https://moneybro-3a909.firebaseio.com",
+    "project_id": "moneybro-3a909",
+    "storage_bucket": "moneybro-3a909.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:756271737589:android:633af79a534376c947f3bc",
+        "android_client_info": {
+          "package_name": "com.innovant.moneybro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "756271737589-odevtb2u4h8fe0u5bdrhfjv7828fi7v3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPLzLZ78RwPmVgS1aBKvsZFrLZIRPYXRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "756271737589-odevtb2u4h8fe0u5bdrhfjv7828fi7v3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
