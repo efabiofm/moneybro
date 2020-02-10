@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,42 +15,43 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_signup);
         getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
     }
 
-    public void login(View view) {
-        Button loginBtn = findViewById(R.id.loginBtn);
-        EditText emailField = findViewById(R.id.loginEmailField);
-        EditText passwordField = findViewById(R.id.loginPassField);
+    public void signup(View view) {
+        Button signupBtn = findViewById(R.id.signupBtn);
+        EditText emailField = findViewById(R.id.signupEmailField);
+        EditText passwordField = findViewById(R.id.signupPassField);
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
-        loginBtn.setEnabled(false);
+        signupBtn.setEnabled(false);
 
         // add input validations
-        mAuth.signInWithEmailAndPassword(emailValue, passwordValue)
+        mAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
-                            Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
+                            // add extra data to user
+                            Toast.makeText(SignupActivity.this, "Usuario registrado", Toast.LENGTH_LONG).show();
+                            // go to login
                         } else {
-                            Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
     }
 
-    public void goToSignup(View view) {
-        startActivity(new Intent(MainActivity.this, SignupActivity.class));
+    public void goToLogin(View view) {
+        startActivity(new Intent(SignupActivity.this, MainActivity.class));
     }
 }
