@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -28,18 +29,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        // disable button
+        Button loginBtn = findViewById(R.id.loginBtn);
         EditText emailField = findViewById(R.id.loginEmailField);
         EditText passwordField = findViewById(R.id.loginPassField);
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
+        loginBtn.setEnabled(false);
+
         // add input validations
         mAuth.signInWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // go to home page
+                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
                             Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();

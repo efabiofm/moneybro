@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -27,11 +28,13 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void signup(View view) {
-        // disable button
+        Button signupBtn = findViewById(R.id.signupBtn);
         EditText emailField = findViewById(R.id.signupEmailField);
         EditText passwordField = findViewById(R.id.signupPassField);
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
+        signupBtn.setEnabled(false);
+
         // add input validations
         mAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
