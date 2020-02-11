@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,24 +26,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
+
+        // If user is already logged in, go to home
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(MainActivity.this, HomeActivity.class));
+            finish();
+        }
     }
 
     public void login(View view) {
-        Button loginBtn = findViewById(R.id.loginBtn);
+        final Button loginBtn = findViewById(R.id.loginBtn);
         EditText emailField = findViewById(R.id.loginEmailField);
         EditText passwordField = findViewById(R.id.loginPassField);
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
+
+        if (TextUtils.isEmpty(emailValue)) {
+            emailField.setError("Email is required");
+            return;
+        }
+
+        if (TextUtils.isEmpty(passwordValue)) {
+            passwordField.setError("Password is required");
+            return;
+        }
+
         loginBtn.setEnabled(false);
 
-        // add input validations
         mAuth.signInWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                            loginBtn.setEnabled(true);
                             Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                            finish(); // Restarts navigation history so user can't go back to login
                         } else {
                             Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();
                         }

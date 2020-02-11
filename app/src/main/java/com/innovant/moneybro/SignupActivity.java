@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,22 +30,62 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void signup(View view) {
-        Button signupBtn = findViewById(R.id.signupBtn);
+        final Button signupBtn = findViewById(R.id.signupBtn);
+        EditText nameField = findViewById(R.id.singupNameField);
+        EditText phoneField = findViewById(R.id.signupPhoneField);
+        EditText passConfirmField = findViewById(R.id.signupPassConfirmField);
         EditText emailField = findViewById(R.id.signupEmailField);
         EditText passwordField = findViewById(R.id.signupPassField);
+
+        String nameValue = nameField.getText().toString();
+        String phoneValue = phoneField.getText().toString();
+        String passConfirmValue = passConfirmField.getText().toString();
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
+
+        if (TextUtils.isEmpty(nameValue)) {
+            nameField.setError("Nombre requerido");
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(emailValue).matches()) {
+            emailField.setError("Formato de correo inválido");
+            return;
+        }
+
+        if (TextUtils.isEmpty(phoneValue)) {
+            phoneField.setError("Teléfono requerido");
+            return;
+        }
+
+        if (passwordValue.length() < 6) {
+            passwordField.setError("La contraseña debe contener al menos 6 dígitos");
+            return;
+        }
+
+        if (!isAlphanumeric(passwordValue)) {
+            passwordField.setError("La contraseña debe contener al menos una letra y un número");
+            return;
+        }
+
+        if (!TextUtils.equals(passwordValue, passConfirmValue)) {
+            passwordField.setError("Los valores no coinciden");
+            passConfirmField.setError("Los valores no coinciden");
+            return;
+        }
+
         signupBtn.setEnabled(false);
 
-        // add input validations
         mAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // add extra data to user
+                            // Add extra data to user
+                            signupBtn.setEnabled(true);
                             Toast.makeText(SignupActivity.this, "Usuario registrado", Toast.LENGTH_LONG).show();
-                            // go to login
+                            startActivity(new Intent(SignupActivity.this, HomeActivity.class));
+                            finish(); // Restarts navigation history so user can't go back to signup
                         } else {
                             Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
                         }
@@ -53,5 +95,11 @@ public class SignupActivity extends AppCompatActivity {
 
     public void goToLogin(View view) {
         startActivity(new Intent(SignupActivity.this, MainActivity.class));
+    }
+
+    public boolean isAlphanumeric(String str) {
+        String numericPattern = ".*[0-9].*";
+        String letterPattern = ".*[A-Za-z].*";
+        return str.matches(numericPattern) && str.matches(letterPattern);
     }
 }
