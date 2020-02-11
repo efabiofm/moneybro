@@ -57,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        loginBtn.setEnabled(true);
                         if (task.isSuccessful()) {
-                            loginBtn.setEnabled(true);
                             Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(MainActivity.this, HomeActivity.class));
-                            finish(); // Restarts navigation history so user can't go back to login
+                            finish(); // Prevents going back to login
                         } else {
                             Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();
                         }

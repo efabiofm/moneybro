@@ -13,13 +13,20 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +34,7 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
         getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
     }
 
     public void signup(View view) {
@@ -37,8 +45,8 @@ public class SignupActivity extends AppCompatActivity {
         EditText emailField = findViewById(R.id.signupEmailField);
         EditText passwordField = findViewById(R.id.signupPassField);
 
-        String nameValue = nameField.getText().toString();
-        String phoneValue = phoneField.getText().toString();
+        final String nameValue = nameField.getText().toString();
+        final String phoneValue = phoneField.getText().toString();
         String passConfirmValue = passConfirmField.getText().toString();
         String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
@@ -81,11 +89,20 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Add extra data to user
-                            signupBtn.setEnabled(true);
-                            Toast.makeText(SignupActivity.this, "Usuario registrado", Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(SignupActivity.this, HomeActivity.class));
-                            finish(); // Restarts navigation history so user can't go back to signup
+                            String userId = mAuth.getCurrentUser().getUid();
+                            DocumentReference docRef = db.collection("users").document(userId);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("name", nameValue);
+                            user.put("phone", phoneValue);
+                            docRef.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    signupBtn.setEnabled(true);
+                                    Toast.makeText(SignupActivity.this, "Usuario registrado", Toast.LENGTH_LONG).show();
+                                    startActivity(new Intent(SignupActivity.this, HomeActivity.class));
+                                    finish(); // Prevents going back to signup
+                                }
+                            });
                         } else {
                             Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
                         }
