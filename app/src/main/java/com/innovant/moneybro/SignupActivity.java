@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.innovant.moneybro.Utils;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -120,7 +120,7 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
 
-        if (!isAlphanumeric(password)) {
+        if (!Utils.isAlphanumeric(password)) {
             passwordField.setError("La contraseña debe contener al menos una letra y un número");
             return false;
         }
@@ -135,11 +135,5 @@ public class SignupActivity extends AppCompatActivity {
 
     public void goToLogin(View view) {
         startActivity(new Intent(SignupActivity.this, MainActivity.class));
-    }
-
-    public boolean isAlphanumeric(String str) {
-        String numericPattern = ".*[0-9].*";
-        String letterPattern = ".*[A-Za-z].*";
-        return str.matches(numericPattern) && str.matches(letterPattern);
     }
 }
