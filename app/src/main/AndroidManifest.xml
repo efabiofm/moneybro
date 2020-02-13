@@ -10,8 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".HomeActivity"></activity>
-        <activity android:name=".SignupActivity" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".SignupActivity"
+            android:screenOrientation="sensorPortrait"/>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="sensorPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

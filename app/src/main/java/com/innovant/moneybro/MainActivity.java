@@ -34,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.loginPassField);
 
         // If user is already logged in, go home
-        if (mAuth.getCurrentUser() != null) {
+        /*if (mAuth.getCurrentUser() != null) {
             startActivity(new Intent(MainActivity.this, HomeActivity.class));
             finish();
-        }
+        }*/
     }
 
     public void login(View view) {
