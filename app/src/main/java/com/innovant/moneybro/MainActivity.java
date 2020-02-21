@@ -15,10 +15,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private Button loginBtn;
     private EditText emailField;
     private EditText passwordField;
@@ -32,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginBtn);
         emailField = findViewById(R.id.loginEmailField);
         passwordField = findViewById(R.id.loginPassField);
+
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        db = FirebaseFirestore.getInstance();
+        db.setFirestoreSettings(settings);
 
         // If user is already logged in, go home
         if (mAuth.getCurrentUser() != null) {
