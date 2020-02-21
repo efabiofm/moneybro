@@ -1,5 +1,24 @@
 <resources>
     <string name="app_name">MoneyBro</string>
+    <string-array name="transaction_types">
+        <item>Préstamo</item>
+        <item>Deuda</item>
+    </string-array>
+    <string-array name="reminders_frequency">
+        <item>1 vez al día</item>
+        <item>Cada 3 días</item>
+        <item>Cada semana</item>
+        <item>Cada mes</item>
+    </string-array>
+    <string-array name="transaction_category">
+        <item>Comida</item>
+        <item>Transporte</item>
+        <item>Educación</item>
+        <item>Salud</item>
+        <item>Compras</item>
+        <item>Servicios</item>
+        <item>Otros</item>
+    </string-array>
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
