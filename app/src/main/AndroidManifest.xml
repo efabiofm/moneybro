@@ -10,7 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".TransactionActivity" />
-        <activity android:name=".HomeActivity" />
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".SignupActivity"
             android:screenOrientation="sensorPortrait" />

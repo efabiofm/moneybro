@@ -21,6 +21,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TransactionActivity extends AppCompatActivity {
+    private FirebaseAuth mAuth;
     private TextInputEditText deadlineInput;
     private TextInputEditText moneyInput;
     private TextInputEditText interestInput;
@@ -54,6 +56,7 @@ public class TransactionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction);
+        mAuth = FirebaseAuth.getInstance();
 
         deadlineInput = findViewById(R.id.deadlineInputText);
         moneyInput = findViewById(R.id.moneyInputText);
@@ -114,8 +117,10 @@ public class TransactionActivity extends AppCompatActivity {
         boolean valorSmsCheckbox = Boolean.parseBoolean(smsCheckbox.getText().toString());
         String frecuenciaRecordatorios = remindersSpinner.getSelectedItem().toString();
         String categoria = categoriesSpinner.getSelectedItem().toString();
+        String userId = mAuth.getCurrentUser().getUid();
 
         Map<String, Object> transaccion = new HashMap<>();
+        transaccion.put("userId", userId);
         transaccion.put("type", tipoTransaccion);
         transaccion.put("amount", monto);
         transaccion.put("interest", interes);
