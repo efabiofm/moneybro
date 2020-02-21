@@ -2,15 +2,17 @@ package com.innovant.moneybro;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,14 +27,19 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TransactionActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+
+    private MaterialSearchBar searchBar;
     private TextInputEditText deadlineInput;
     private TextInputEditText moneyInput;
     private TextInputEditText interestInput;
@@ -49,6 +56,7 @@ public class TransactionActivity extends AppCompatActivity {
     private MaterialDatePicker picker;
     private CalendarConstraints.Builder constraintsBuilder;
     private Button botonCrear;
+    private LayoutInflater inflater;
 
     private FirebaseFirestore db;
 
@@ -58,6 +66,7 @@ public class TransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transaction);
         mAuth = FirebaseAuth.getInstance();
 
+        searchBar = findViewById(R.id.searchBar);
         deadlineInput = findViewById(R.id.deadlineInputText);
         moneyInput = findViewById(R.id.moneyInputText);
         interestInput = findViewById(R.id.interestInputText);
@@ -89,12 +98,44 @@ public class TransactionActivity extends AppCompatActivity {
         });
 
         botonCrear = findViewById(R.id.transactionSubmitBtn);
+        inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        CustomSuggestionAdapter csa = new CustomSuggestionAdapter(inflater);
+        List<User> suggestions = new ArrayList<>();
+        suggestions.add(new User("1", "fabio@mail.com"));
+        suggestions.add(new User("2", "ernesto@mail.com"));
+        csa.setSuggestions(suggestions);
+        searchBar.setCustomSuggestionAdapter(csa);
 
         db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
+
+        searchBar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("busqueda", s.toString());
+//                CustomSuggestionAdapter csa = new CustomSuggestionAdapter(inflater);
+//                List<User> suggestions = new ArrayList<>();
+//                for(int i=1; i<3; i++) {
+//                    suggestions.add(new User("1", "fabio@mail.com"));
+//                }
+//                csa.setSuggestions(suggestions);
+//                searchBar.setCustomSuggestionAdapter(csa);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void setSpinnerAdapter(Spinner spinner, int array) {
