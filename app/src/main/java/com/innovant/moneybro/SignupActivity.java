@@ -21,7 +21,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.innovant.moneybro.Utils;
 
 public class SignupActivity extends AppCompatActivity {
 
