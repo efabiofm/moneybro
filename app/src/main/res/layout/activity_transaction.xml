@@ -19,9 +19,9 @@
             style="@style/MaterialSearchBarLight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:mt_hint="Buscar por nombre"
+            app:mt_hint="Ingrese el nombre"
             app:mt_maxSuggestionsCount="10"
-            app:mt_placeholder="Usuario"
+            app:mt_placeholder="Buscar usuario"
             app:mt_speechMode="false"/>
 
         <TextView
