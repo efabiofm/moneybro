@@ -19,10 +19,25 @@
             style="@style/MaterialSearchBarLight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:mt_hint="Buscar por correo"
+            app:mt_hint="Ingrese el nombre"
             app:mt_maxSuggestionsCount="10"
-            app:mt_placeholder="Usuario"
-            app:mt_speechMode="false" />
+            app:mt_placeholder="Buscar usuario"
+            app:mt_speechMode="false"/>
+
+        <TextView
+            android:id="@+id/userLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Usuario"
+            android:layout_marginLeft="13dp"
+            android:layout_marginBottom="13dp"/>
+        <TextView
+            android:id="@+id/userSelected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sin seleccionar"
+            android:textSize="18dp"
+            android:layout_marginLeft="13dp"/>
 
         <fr.ganfra.materialspinner.MaterialSpinner
             android:id="@+id/transactions_spinner"

@@ -51,7 +51,7 @@ public class SignupActivity extends AppCompatActivity {
     public void signup(View view) {
         final String nameValue = nameField.getText().toString();
         final String phoneValue = phoneField.getText().toString();
-        String emailValue = emailField.getText().toString();
+        final String emailValue = emailField.getText().toString();
         String passwordValue = passwordField.getText().toString();
 
         if (isFormValid()) {
@@ -65,6 +65,7 @@ public class SignupActivity extends AppCompatActivity {
                                 Map<String, Object> user = new HashMap<>();
                                 user.put("name", nameValue);
                                 user.put("phone", phoneValue);
+                                user.put("email", emailValue);
                                 createUser(user);
                             } else {
                                 Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
