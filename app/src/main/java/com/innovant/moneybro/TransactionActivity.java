@@ -2,8 +2,11 @@ package com.innovant.moneybro;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -162,6 +165,12 @@ public class TransactionActivity extends AppCompatActivity {
     }
 
     public void crearTransaccion(View view) {
+        Map<String, Object> transaccion = getObjetoTransaccion();
+        botonCrear.setEnabled(false);
+        guardarTransaccionFirebase(transaccion);
+    }
+
+    private Map<String, Object> getObjetoTransaccion() {
         String tipoTransaccion = transactionSpinner.getSelectedItem().toString();
         int monto = Integer.parseInt(moneyInput.getText().toString());
         int interes = Integer.parseInt(interestInput.getText().toString());
@@ -185,6 +194,7 @@ public class TransactionActivity extends AppCompatActivity {
         transaccion.put("remindersFrequency", frecuenciaRecordatorios);
         transaccion.put("category", categoria);
         transaccion.put("userName", userView.getText().toString());
+        transaccion.put("state", "Pendiente");
 
         for (QueryDocumentSnapshot doc : usuarios) {
             if (doc.getData().get("name").toString() == userView.getText().toString()) {
@@ -193,29 +203,30 @@ public class TransactionActivity extends AppCompatActivity {
         }
 
         transaccion.put("userId", userId);
-        botonCrear.setEnabled(false);
+        return transaccion;
+    }
 
+    private void guardarTransaccionFirebase(Map<String, Object> transaccion) {
         db.collection("transactions")
-                .add(transaccion)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(TransactionActivity.this, "Transacción creada con éxito", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(TransactionActivity.this, HomeActivity.class));
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(TransactionActivity.this, "Ocurrió un error inesperado", Toast.LENGTH_LONG).show();
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        botonCrear.setEnabled(true);
-                    }
-                });
-
+            .add(transaccion)
+            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Toast.makeText(TransactionActivity.this, "Transacción creada con éxito", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(TransactionActivity.this, HomeActivity.class));
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(TransactionActivity.this, "Ocurrió un error inesperado", Toast.LENGTH_LONG).show();
+                }
+            })
+            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentReference> task) {
+                    botonCrear.setEnabled(true);
+                }
+            });
     }
 }
