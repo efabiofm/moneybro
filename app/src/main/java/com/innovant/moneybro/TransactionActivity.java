@@ -36,8 +36,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -180,10 +182,10 @@ public class TransactionActivity extends AppCompatActivity {
         boolean valorSmsCheckbox = Boolean.parseBoolean(smsCheckbox.getText().toString());
         String frecuenciaRecordatorios = remindersSpinner.getSelectedItem().toString();
         String categoria = categoriesSpinner.getSelectedItem().toString();
-        String ownerId = mAuth.getCurrentUser().getUid();
-        String userId = "";
+        String creatorId = mAuth.getCurrentUser().getUid();
+        String receiverId = "";
         Map<String, Object> transaccion = new HashMap<>();
-        transaccion.put("ownerId", ownerId);
+        transaccion.put("creatorId", creatorId);
         transaccion.put("type", tipoTransaccion);
         transaccion.put("amount", monto);
         transaccion.put("interest", interes);
@@ -193,16 +195,20 @@ public class TransactionActivity extends AppCompatActivity {
         transaccion.put("smsNotifications", valorSmsCheckbox);
         transaccion.put("remindersFrequency", frecuenciaRecordatorios);
         transaccion.put("category", categoria);
-        transaccion.put("userName", userView.getText().toString());
+        transaccion.put("receiverName", userView.getText().toString());
         transaccion.put("state", "Pendiente");
 
         for (QueryDocumentSnapshot doc : usuarios) {
             if (doc.getData().get("name").toString() == userView.getText().toString()) {
-                userId = doc.getId();
+                receiverId = doc.getId();
+            }
+            if (doc.getId() == creatorId) {
+                transaccion.put("creatorName", doc.getData().get("name"));
             }
         }
 
-        transaccion.put("userId", userId);
+        transaccion.put("receiverId", receiverId);
+        transaccion.put("showTo", new ArrayList<>(Arrays.asList(creatorId, receiverId)));
         return transaccion;
     }
 

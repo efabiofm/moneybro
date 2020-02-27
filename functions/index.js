@@ -6,15 +6,14 @@ admin.initializeApp();
 exports.sendTransactionNotification = functions.firestore.document('/transactions/{transactionId}')
     .onCreate((snap, context) => {
         const data = snap.data();
-        return admin.firestore().doc('users/' + data.userId).get().then(userDoc => {
+        return admin.firestore().doc('users/' + data.receiverId).get().then(userDoc => {
             const fcmToken = userDoc.get('fcmToken');
-            const senderName = userDoc.get('name');
 
             const payload = {
                 notification: {
-                    title: senderName + ' solicita tu confirmación',
+                    title: data.creatorName + ' solicita tu confirmación',
                     body: 'Se ha realizado un ' + data.type + ' por ₡' + data.amount,
-                    clickAction: 'PendingsActivity'
+                    clickAction: 'HomeActivity'
                 }
             };
 
@@ -22,9 +21,9 @@ exports.sendTransactionNotification = functions.firestore.document('/transaction
                 return response.results.forEach((result, index) => {
                     const error = result.error;
                     if (error) {
-                        console.error('message not sent', error);
+                        console.error('Error sending message', error);
                     } else {
-                        console.log('message sent');
+                        console.log('Message sent to ' + fcmToken);
                     }
                 });
             });

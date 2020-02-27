@@ -1,5 +1,6 @@
 package com.innovant.moneybro;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,13 +69,14 @@ public class HomeActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        final Context context = this;
 
         listView = findViewById(R.id.transactions_list);
         mAuth = FirebaseAuth.getInstance();
 
         String uid = mAuth.getUid();
         db = FirebaseFirestore.getInstance();
-        db.collection("transactions").whereEqualTo("ownerId", uid).get()
+        db.collection("transactions").whereArrayContains("showTo", uid).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -84,19 +86,11 @@ public class HomeActivity extends AppCompatActivity {
                                 Map<String, Object> transaccion = doc.getData();
                                 transacciones.add(transaccion);
                             }
-                            CustomAdapter customAdapter = new CustomAdapter(transacciones);
+                            CustomAdapter customAdapter = new CustomAdapter(context, transacciones);
                             listView.setAdapter(customAdapter);
                         }
                     }
                 });
-
-//        ListView listView = findViewById(R.id.transactions_list);
-//        ArrayList<String> arrayList = new ArrayList<>();
-//        arrayList.add("android");
-//        arrayList.add("ios");
-//
-//        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayList);
-//        listView.setAdapter(arrayAdapter);
     }
 
     @Override
@@ -115,47 +109,5 @@ public class HomeActivity extends AppCompatActivity {
 
     public void startTransaction(View view) {
         startActivity(new Intent(HomeActivity.this, TransactionActivity.class));
-    }
-
-    class CustomAdapter extends BaseAdapter {
-        private List<Map<String, Object>> transacciones;
-
-        public CustomAdapter(List<Map<String, Object>> transacciones) {
-            this.transacciones = transacciones;
-        }
-        @Override
-        public int getCount() {
-            return transacciones.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            view = getLayoutInflater().inflate(R.layout.transaction_list_row, null, false);
-            TextView title = view.findViewById(R.id.tListTitle);
-            TextView type = view.findViewById(R.id.tListType);
-            TextView deadline = view.findViewById(R.id.tListDeadline);
-            TextView amount = view.findViewById(R.id.tListAmount);
-
-            Timestamp timestamp = (Timestamp) transacciones.get(i).get("deadline");
-            Date fecha = timestamp.toDate();
-            Locale locale = new Locale("es", "ES");
-            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-
-            title.setText(transacciones.get(i).get("userName").toString());
-            type.setText(transacciones.get(i).get("type").toString());
-            deadline.setText("Finaliza: " + dateFormat.format(fecha));
-            amount.setText("₡" + transacciones.get(i).get("amount").toString());
-            return view;
-        }
     }
 }
