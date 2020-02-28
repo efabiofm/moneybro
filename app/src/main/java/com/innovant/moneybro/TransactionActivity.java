@@ -2,11 +2,8 @@ package com.innovant.moneybro;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -30,13 +27,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mancj.materialsearchbar.MaterialSearchBar;
-import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
-
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,6 +177,7 @@ public class TransactionActivity extends AppCompatActivity {
         String categoria = categoriesSpinner.getSelectedItem().toString();
         String creatorId = mAuth.getCurrentUser().getUid();
         String receiverId = "";
+        String creatorName = "";
         Map<String, Object> transaccion = new HashMap<>();
         transaccion.put("creatorId", creatorId);
         transaccion.put("type", tipoTransaccion);
@@ -199,14 +193,14 @@ public class TransactionActivity extends AppCompatActivity {
         transaccion.put("state", "Pendiente");
 
         for (QueryDocumentSnapshot doc : usuarios) {
-            if (doc.getData().get("name").toString() == userView.getText().toString()) {
+            if (doc.getId().equals(creatorId)) {
+                creatorName = doc.getData().get("name").toString();
+            }
+            if (doc.getData().get("name").toString().equals(userView.getText().toString())) {
                 receiverId = doc.getId();
             }
-            if (doc.getId() == creatorId) {
-                transaccion.put("creatorName", doc.getData().get("name"));
-            }
         }
-
+        transaccion.put("creatorName", creatorName);
         transaccion.put("receiverId", receiverId);
         transaccion.put("showTo", new ArrayList<>(Arrays.asList(creatorId, receiverId)));
         return transaccion;

@@ -6,13 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.google.firebase.Timestamp;
-
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 class CustomAdapter extends BaseAdapter {
@@ -47,13 +41,8 @@ class CustomAdapter extends BaseAdapter {
         TextView amount = view.findViewById(R.id.tListAmount);
         TextView state = view.findViewById(R.id.tListState);
 
-        Timestamp timestamp = (Timestamp) transacciones.get(i).get("deadline");
-        Date fecha = timestamp.toDate();
-        Locale locale = new Locale("es", "ES");
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-
         title.setText(transacciones.get(i).get("type").toString());
-        deadline.setText("Finaliza: " + dateFormat.format(fecha));
+        deadline.setText("Finaliza: " + Utils.formatDate(transacciones.get(i).get("deadline")));
         amount.setText("₡" + transacciones.get(i).get("amount").toString());
         state.setText(transacciones.get(i).get("state").toString());
         return view;

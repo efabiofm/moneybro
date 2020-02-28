@@ -2,46 +2,31 @@ package com.innovant.moneybro;
 
 import android.content.Context;
 import android.os.Bundle;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.view.Menu;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
@@ -50,11 +35,15 @@ public class HomeActivity extends AppCompatActivity {
     private ListView listView;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private TextView noData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        noData = findViewById(R.id.noDataText);
+        noData.setVisibility(View.GONE);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -81,13 +70,27 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            List<Map<String, Object>> transacciones = new ArrayList<>();
+                            final List<Map<String, Object>> transacciones = new ArrayList<>();
                             for(QueryDocumentSnapshot doc : task.getResult()) {
                                 Map<String, Object> transaccion = doc.getData();
-                                transacciones.add(transaccion);
+                                String state = transaccion.get("state").toString();
+                                if (state.equals("Pendiente") || state.equals("Confirmado")) {
+                                    transaccion.put("id", doc.getId());
+                                    transacciones.add(transaccion);
+                                }
                             }
                             CustomAdapter customAdapter = new CustomAdapter(context, transacciones);
                             listView.setAdapter(customAdapter);
+                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    startActivity(createDetailsIntent(transacciones.get(position)));
+                                }
+                            });
+
+                            if (transacciones.size() == 0) {
+                                noData.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 });
@@ -109,5 +112,20 @@ public class HomeActivity extends AppCompatActivity {
 
     public void startTransaction(View view) {
         startActivity(new Intent(HomeActivity.this, TransactionActivity.class));
+    }
+
+    private Intent createDetailsIntent(Map<String, Object> transaction) {
+        Intent details = new Intent(HomeActivity.this, TransactionDetailsActivity.class);
+        details.putExtra("id", transaction.get("id").toString());
+        details.putExtra("creatorId", transaction.get("creatorId").toString());
+        details.putExtra("receiverId", transaction.get("receiverId").toString());
+        details.putExtra("type", transaction.get("type").toString());
+        details.putExtra("creatorName", transaction.get("creatorName").toString());
+        details.putExtra("receiverName", transaction.get("receiverName").toString());
+        details.putExtra("state", transaction.get("state").toString());
+        details.putExtra("deadline", Utils.formatDate(transaction.get("deadline")));
+        details.putExtra("amount", transaction.get("amount").toString());
+        details.putExtra("category", transaction.get("category").toString());
+        return details;
     }
 }

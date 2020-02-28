@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="16dp">
+
+    <TextView
+        android:id="@+id/tdState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdFromLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="De" />
+
+    <TextView
+        android:id="@+id/tdFromValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdWithLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Con" />
+
+    <TextView
+        android:id="@+id/tdWithValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdAmountLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Cantidad" />
+
+    <TextView
+        android:id="@+id/tdAmountValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdDeadlineLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Finaliza" />
+
+    <TextView
+        android:id="@+id/tdDeadlineValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/tdCategoryLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Categoría" />
+
+    <TextView
+        android:id="@+id/tdCategoryValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tdConfirmBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirmar"
+        android:onClick="confirmTransaction"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tdRejectBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/design_default_color_error"
+        android:text="Rechazar"
+        android:onClick="rejectTransaction"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tdCancelBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/design_default_color_background"
+        android:textColor="#000000"
+        android:text="Cancelar"
+        android:onClick="cancelTransaction"/>
+</LinearLayout>
