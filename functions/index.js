@@ -13,7 +13,7 @@ exports.sendTransactionNotification = functions.firestore.document('/transaction
                 notification: {
                     title: data.creatorName + ' solicita tu confirmación',
                     body: 'Se ha realizado un ' + data.type + ' por ₡' + data.amount,
-                    clickAction: 'HomeActivity'
+                    clickAction: 'HOME_ACTIVITY'
                 }
             };
 
