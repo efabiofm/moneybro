@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private TextView noData;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         noData = findViewById(R.id.noDataText);
         noData.setVisibility(View.GONE);
+
+        progressBar = findViewById(R.id.progressBarHome);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,6 +73,7 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
                             final List<Map<String, Object>> transacciones = new ArrayList<>();
                             for(QueryDocumentSnapshot doc : task.getResult()) {
