@@ -4,16 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.ajithvgiri.searchdialog.OnSearchItemSelected;
+import com.ajithvgiri.searchdialog.SearchListItem;
+import com.ajithvgiri.searchdialog.SearchableDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +29,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.mancj.materialsearchbar.MaterialSearchBar;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,10 +40,7 @@ import java.util.Map;
 public class TransactionActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
-    private MaterialSearchBar searchBar;
-    private CustomSuggestionAdapter suggestionAdapter;
-
-    private TextView userView;
+    private TextView userSelectedText;
     private TextInputEditText deadlineInput;
     private TextInputEditText moneyInput;
     private TextInputEditText interestInput;
@@ -61,10 +57,11 @@ public class TransactionActivity extends AppCompatActivity {
     private MaterialDatePicker picker;
     private CalendarConstraints.Builder constraintsBuilder;
     private Button botonCrear;
-    private LayoutInflater inflater;
 
     private FirebaseFirestore db;
     private QuerySnapshot usuarios;
+    private SearchableDialog buscadorUsuarios;
+    private int userSelectedIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +72,7 @@ public class TransactionActivity extends AppCompatActivity {
         deadlineInput = findViewById(R.id.deadlineInputText);
         moneyInput = findViewById(R.id.moneyInputText);
         interestInput = findViewById(R.id.interestInputText);
+        userSelectedText = findViewById(R.id.userSelected);
 
         transactionSpinner = findViewById(R.id.transactions_spinner);
         remindersSpinner = findViewById(R.id.reminders_spinner);
@@ -109,42 +107,30 @@ public class TransactionActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         usuarios = task.getResult();
+                        initSearchBar();
                     }
                 });
-
-        initSearchBar();
     }
 
     private void initSearchBar() {
-        userView = findViewById(R.id.userSelected);
-        searchBar = findViewById(R.id.searchBar);
-        inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        suggestionAdapter = new CustomSuggestionAdapter(inflater, searchBar, userView);
-        List<User> suggestions = new ArrayList<>();
-        suggestionAdapter.setSuggestions(suggestions);
-        searchBar.setCustomSuggestionAdapter(suggestionAdapter);
-
-        searchBar.addTextChangeListener(new TextWatcher() {
+        List<SearchListItem> searchListItems = new ArrayList<>();
+        for(int i=0; i < usuarios.size(); i++) {
+            String name = usuarios.getDocuments().get(i).get("name").toString();
+            searchListItems.add(new SearchListItem(i, name));
+        }
+        buscadorUsuarios = new SearchableDialog(this, (ArrayList<SearchListItem>) searchListItems, "Usuarios");
+        buscadorUsuarios.setOnItemSelected(new OnSearchItemSelected() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            public void onClick(int i, SearchListItem searchListItem) {
+                userSelectedText.setText(searchListItem.getTitle());
+                userSelectedIndex = i;
+                buscadorUsuarios.dismiss();
             }
-
+        });
+        userSelectedText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<User> resultados = new ArrayList<>();
-                for(QueryDocumentSnapshot doc : usuarios) {
-                    Map<String, Object> usuario = doc.getData();
-                    if (usuario.get("name").toString().contains(s.toString())) {
-                        resultados.add(new User(doc.getId(), usuario.get("name").toString(), usuario.get("email").toString()));
-                    }
-                }
-                searchBar.updateLastSuggestions(resultados);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
+            public void onClick(View v) {
+                buscadorUsuarios.show();
             }
         });
     }
@@ -176,8 +162,8 @@ public class TransactionActivity extends AppCompatActivity {
         String frecuenciaRecordatorios = remindersSpinner.getSelectedItem().toString();
         String categoria = categoriesSpinner.getSelectedItem().toString();
         String creatorId = mAuth.getCurrentUser().getUid();
-        String receiverId = "";
-        String creatorName = "";
+        String receiverId = usuarios.getDocuments().get(userSelectedIndex).getId();
+
         Map<String, Object> transaccion = new HashMap<>();
         transaccion.put("creatorId", creatorId);
         transaccion.put("type", tipoTransaccion);
@@ -189,20 +175,17 @@ public class TransactionActivity extends AppCompatActivity {
         transaccion.put("smsNotifications", valorSmsCheckbox);
         transaccion.put("remindersFrequency", frecuenciaRecordatorios);
         transaccion.put("category", categoria);
-        transaccion.put("receiverName", userView.getText().toString());
+        transaccion.put("receiverName", userSelectedText.getText().toString());
         transaccion.put("state", "Pendiente");
+        transaccion.put("receiverId", receiverId);
+        transaccion.put("showTo", new ArrayList<>(Arrays.asList(creatorId, receiverId)));
 
         for (QueryDocumentSnapshot doc : usuarios) {
             if (doc.getId().equals(creatorId)) {
-                creatorName = doc.getData().get("name").toString();
-            }
-            if (doc.getData().get("name").toString().equals(userView.getText().toString())) {
-                receiverId = doc.getId();
+                String creatorName = doc.getData().get("name").toString();
+                transaccion.put("creatorName", creatorName);
             }
         }
-        transaccion.put("creatorName", creatorName);
-        transaccion.put("receiverId", receiverId);
-        transaccion.put("showTo", new ArrayList<>(Arrays.asList(creatorId, receiverId)));
         return transaccion;
     }
 
