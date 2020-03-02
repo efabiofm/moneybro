@@ -27,14 +27,12 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mancj.materialsearchbar.MaterialSearchBar;
-import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -162,6 +160,12 @@ public class TransactionActivity extends AppCompatActivity {
     }
 
     public void crearTransaccion(View view) {
+        Map<String, Object> transaccion = getObjetoTransaccion();
+        botonCrear.setEnabled(false);
+        guardarTransaccionFirebase(transaccion);
+    }
+
+    private Map<String, Object> getObjetoTransaccion() {
         String tipoTransaccion = transactionSpinner.getSelectedItem().toString();
         int monto = Integer.parseInt(moneyInput.getText().toString());
         int interes = Integer.parseInt(interestInput.getText().toString());
@@ -171,10 +175,11 @@ public class TransactionActivity extends AppCompatActivity {
         boolean valorSmsCheckbox = Boolean.parseBoolean(smsCheckbox.getText().toString());
         String frecuenciaRecordatorios = remindersSpinner.getSelectedItem().toString();
         String categoria = categoriesSpinner.getSelectedItem().toString();
-        String ownerId = mAuth.getCurrentUser().getUid();
-        String userId = "";
+        String creatorId = mAuth.getCurrentUser().getUid();
+        String receiverId = "";
+        String creatorName = "";
         Map<String, Object> transaccion = new HashMap<>();
-        transaccion.put("ownerId", ownerId);
+        transaccion.put("creatorId", creatorId);
         transaccion.put("type", tipoTransaccion);
         transaccion.put("amount", monto);
         transaccion.put("interest", interes);
@@ -184,38 +189,44 @@ public class TransactionActivity extends AppCompatActivity {
         transaccion.put("smsNotifications", valorSmsCheckbox);
         transaccion.put("remindersFrequency", frecuenciaRecordatorios);
         transaccion.put("category", categoria);
-        transaccion.put("userName", userView.getText().toString());
+        transaccion.put("receiverName", userView.getText().toString());
+        transaccion.put("state", "Pendiente");
 
         for (QueryDocumentSnapshot doc : usuarios) {
-            if (doc.getData().get("name").toString() == userView.getText().toString()) {
-                userId = doc.getId();
+            if (doc.getId().equals(creatorId)) {
+                creatorName = doc.getData().get("name").toString();
+            }
+            if (doc.getData().get("name").toString().equals(userView.getText().toString())) {
+                receiverId = doc.getId();
             }
         }
+        transaccion.put("creatorName", creatorName);
+        transaccion.put("receiverId", receiverId);
+        transaccion.put("showTo", new ArrayList<>(Arrays.asList(creatorId, receiverId)));
+        return transaccion;
+    }
 
-        transaccion.put("userId", userId);
-        botonCrear.setEnabled(false);
-
+    private void guardarTransaccionFirebase(Map<String, Object> transaccion) {
         db.collection("transactions")
-                .add(transaccion)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(TransactionActivity.this, "Transacción creada con éxito", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(TransactionActivity.this, HomeActivity.class));
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(TransactionActivity.this, "Ocurrió un error inesperado", Toast.LENGTH_LONG).show();
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        botonCrear.setEnabled(true);
-                    }
-                });
-
+            .add(transaccion)
+            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Toast.makeText(TransactionActivity.this, "Transacción creada con éxito", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(TransactionActivity.this, HomeActivity.class));
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(TransactionActivity.this, "Ocurrió un error inesperado", Toast.LENGTH_LONG).show();
+                }
+            })
+            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentReference> task) {
+                    botonCrear.setEnabled(true);
+                }
+            });
     }
 }

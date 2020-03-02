@@ -18,6 +18,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,20 +60,30 @@ public class SignupActivity extends AppCompatActivity {
             signupBtn.setEnabled(false);
 
             mAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                Map<String, Object> user = new HashMap<>();
-                                user.put("name", nameValue);
-                                user.put("phone", phoneValue);
-                                user.put("email", emailValue);
-                                createUser(user);
-                            } else {
-                                Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
-                            }
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseInstanceId.getInstance().getInstanceId()
+                                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                        Map<String, Object> user = new HashMap<>();
+                                        user.put("name", nameValue);
+                                        user.put("phone", phoneValue);
+                                        user.put("email", emailValue);
+                                        if (task.isSuccessful()) {
+                                            String token = task.getResult().getToken();
+                                            user.put("fcmToken", token);
+                                        }
+                                        createUser(user);
+                                    }
+                                });
+                        } else {
+                            Toast.makeText(SignupActivity.this, "El registro falló", Toast.LENGTH_LONG).show();
                         }
-                    });
+                    }
+                });
         }
     }
 

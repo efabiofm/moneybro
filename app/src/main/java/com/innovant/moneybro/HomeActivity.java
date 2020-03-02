@@ -1,46 +1,32 @@
 package com.innovant.moneybro;
 
+import android.content.Context;
 import android.os.Bundle;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.view.Menu;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
@@ -49,11 +35,15 @@ public class HomeActivity extends AppCompatActivity {
     private ListView listView;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private TextView noData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        noData = findViewById(R.id.noDataText);
+        noData.setVisibility(View.GONE);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -68,35 +58,42 @@ public class HomeActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        final Context context = this;
 
         listView = findViewById(R.id.transactions_list);
         mAuth = FirebaseAuth.getInstance();
 
         String uid = mAuth.getUid();
         db = FirebaseFirestore.getInstance();
-        db.collection("transactions").whereEqualTo("ownerId", uid).get()
+        db.collection("transactions").whereArrayContains("showTo", uid).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            List<Map<String, Object>> transacciones = new ArrayList<>();
+                            final List<Map<String, Object>> transacciones = new ArrayList<>();
                             for(QueryDocumentSnapshot doc : task.getResult()) {
                                 Map<String, Object> transaccion = doc.getData();
-                                transacciones.add(transaccion);
+                                String state = transaccion.get("state").toString();
+                                if (state.equals("Pendiente") || state.equals("Confirmado")) {
+                                    transaccion.put("id", doc.getId());
+                                    transacciones.add(transaccion);
+                                }
                             }
-                            CustomAdapter customAdapter = new CustomAdapter(transacciones);
+                            CustomAdapter customAdapter = new CustomAdapter(context, transacciones);
                             listView.setAdapter(customAdapter);
+                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    startActivity(createDetailsIntent(transacciones.get(position)));
+                                }
+                            });
+
+                            if (transacciones.size() == 0) {
+                                noData.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 });
-
-//        ListView listView = findViewById(R.id.transactions_list);
-//        ArrayList<String> arrayList = new ArrayList<>();
-//        arrayList.add("android");
-//        arrayList.add("ios");
-//
-//        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayList);
-//        listView.setAdapter(arrayAdapter);
     }
 
     @Override
@@ -117,45 +114,18 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(new Intent(HomeActivity.this, TransactionActivity.class));
     }
 
-    class CustomAdapter extends BaseAdapter {
-        private List<Map<String, Object>> transacciones;
-
-        public CustomAdapter(List<Map<String, Object>> transacciones) {
-            this.transacciones = transacciones;
-        }
-        @Override
-        public int getCount() {
-            return transacciones.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            view = getLayoutInflater().inflate(R.layout.transaction_list_row, null, false);
-            TextView title = view.findViewById(R.id.tListTitle);
-            TextView type = view.findViewById(R.id.tListType);
-            TextView deadline = view.findViewById(R.id.tListDeadline);
-            TextView amount = view.findViewById(R.id.tListAmount);
-
-            Timestamp timestamp = (Timestamp) transacciones.get(i).get("deadline");
-            Date fecha = timestamp.toDate();
-            Locale locale = new Locale("es", "ES");
-            DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-
-            title.setText(transacciones.get(i).get("userName").toString());
-            type.setText(transacciones.get(i).get("type").toString());
-            deadline.setText("Finaliza: " + dateFormat.format(fecha));
-            amount.setText("₡" + transacciones.get(i).get("amount").toString());
-            return view;
-        }
+    private Intent createDetailsIntent(Map<String, Object> transaction) {
+        Intent details = new Intent(HomeActivity.this, TransactionDetailsActivity.class);
+        details.putExtra("id", transaction.get("id").toString());
+        details.putExtra("creatorId", transaction.get("creatorId").toString());
+        details.putExtra("receiverId", transaction.get("receiverId").toString());
+        details.putExtra("type", transaction.get("type").toString());
+        details.putExtra("creatorName", transaction.get("creatorName").toString());
+        details.putExtra("receiverName", transaction.get("receiverName").toString());
+        details.putExtra("state", transaction.get("state").toString());
+        details.putExtra("deadline", Utils.formatDate(transaction.get("deadline")));
+        details.putExtra("amount", transaction.get("amount").toString());
+        details.putExtra("category", transaction.get("category").toString());
+        return details;
     }
 }

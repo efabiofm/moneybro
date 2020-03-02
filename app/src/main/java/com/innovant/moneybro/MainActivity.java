@@ -17,6 +17,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,19 +61,32 @@ public class MainActivity extends AppCompatActivity {
         if (isFormValid()) {
             loginBtn.setEnabled(false);
             mAuth.signInWithEmailAndPassword(emailValue, passwordValue)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            loginBtn.setEnabled(true);
-                            if (task.isSuccessful()) {
-                                Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(MainActivity.this, HomeActivity.class));
-                                finish(); // Prevents going back to login
-                            } else {
-                                Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    loginBtn.setEnabled(true);
+                    if (task.isSuccessful()) {
+                        FirebaseInstanceId.getInstance().getInstanceId()
+                            .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (task.isSuccessful()) {
+                                    String token = task.getResult().getToken();
+                                    String uid = mAuth.getCurrentUser().getUid();
+                                    db.collection("users")
+                                        .document(uid)
+                                        .update("fcmToken", token);
+                                }
+                                }
+                            });
+                        Toast.makeText(MainActivity.this, "Bienvenido", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                        finish(); // Prevents going back to login
+                    } else {
+                        Toast.makeText(MainActivity.this, "Error de autenticación", Toast.LENGTH_LONG).show();
+                    }
+                    }
+                });
         }
     }
 

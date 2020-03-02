@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "756271737589-03tktnq1c12lqrl0iiocs5u6trtocr23.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innovant.moneybro",
+            "certificate_hash": "ddf1479b7f676dd32894d2af6e15b03d4068b9f2"
+          }
+        },
+        {
           "client_id": "756271737589-odevtb2u4h8fe0u5bdrhfjv7828fi7v3.apps.googleusercontent.com",
           "client_type": 3
         }
