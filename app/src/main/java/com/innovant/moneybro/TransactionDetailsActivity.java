@@ -19,7 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class TransactionDetailsActivity extends AppCompatActivity {
     private String transactionId;
     private TextView state;
-    private TextView type;
     private TextView from;
     private TextView with;
     private TextView amount;
@@ -41,10 +40,11 @@ public class TransactionDetailsActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         String uid = mAuth.getCurrentUser().getUid();
+        setTitle(bundle.getString("type"));
+
         transactionId = bundle.getString("id");
 
         state = findViewById(R.id.tdState);
-        type = findViewById(R.id.tdType);;
         from = findViewById(R.id.tdFromValue);;
         with = findViewById(R.id.tdWithValue);;
         amount = findViewById(R.id.tdAmountValue);;
@@ -56,10 +56,9 @@ public class TransactionDetailsActivity extends AppCompatActivity {
         delete = findViewById(R.id.tdCancelBtn);
 
         state.setText(bundle.getString("state"));
-        type.setText(bundle.getString("type"));
         from.setText(bundle.getString("creatorName"));
         with.setText(bundle.getString("receiverName"));
-        amount.setText(bundle.getString("amount"));
+        amount.setText("₡" + bundle.getString("amount"));
         deadline.setText(bundle.getString("deadline"));
         category.setText(bundle.getString("category"));
 

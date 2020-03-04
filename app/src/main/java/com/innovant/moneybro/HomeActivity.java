@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import android.util.Log;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -121,6 +120,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private Intent createDetailsIntent(Map<String, Object> transaction) {
         Intent details = new Intent(HomeActivity.this, TransactionDetailsActivity.class);
+        int monto = Integer.parseInt(transaction.get("amount").toString());
+        int interes = Integer.parseInt(transaction.get("interest").toString());
         details.putExtra("id", transaction.get("id").toString());
         details.putExtra("creatorId", transaction.get("creatorId").toString());
         details.putExtra("receiverId", transaction.get("receiverId").toString());
@@ -129,7 +130,7 @@ public class HomeActivity extends AppCompatActivity {
         details.putExtra("receiverName", transaction.get("receiverName").toString());
         details.putExtra("state", transaction.get("state").toString());
         details.putExtra("deadline", Utils.formatDate(transaction.get("deadline")));
-        details.putExtra("amount", transaction.get("amount").toString());
+        details.putExtra("amount", "" + Utils.calcInterest(monto, interes));
         details.putExtra("category", transaction.get("category").toString());
         return details;
     }

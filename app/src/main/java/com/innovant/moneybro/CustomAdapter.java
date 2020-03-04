@@ -43,7 +43,10 @@ class CustomAdapter extends BaseAdapter {
 
         title.setText(transacciones.get(i).get("type").toString());
         deadline.setText("Finaliza: " + Utils.formatDate(transacciones.get(i).get("deadline")));
-        amount.setText("₡" + transacciones.get(i).get("amount").toString());
+
+        int monto = Integer.parseInt(transacciones.get(i).get("amount").toString());
+        int interes = Integer.parseInt(transacciones.get(i).get("interest").toString());
+        amount.setText("₡" + Utils.calcInterest(monto, interes));
         state.setText(transacciones.get(i).get("state").toString());
         return view;
     }
