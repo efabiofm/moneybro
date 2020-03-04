@@ -3,6 +3,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/transaction_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:titleTextColor="@color/white">
@@ -20,7 +21,7 @@
             android:id="@+id/userLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enviar a"
+            android:text="Enviar a *"
             android:textSize="12dp"
             android:layout_marginLeft="10dp" />
         <TextView
@@ -37,7 +38,7 @@
             android:id="@+id/transactions_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:ms_hint="Tipo de transacción"
+            app:ms_hint="Tipo de transacción *"
             app:ms_floatingLabelText="Tipo de transacción"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -49,7 +50,7 @@
                 android:id="@+id/moneyInputText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Monto"
+                android:hint="Monto *"
                 android:inputType="number"
                 android:backgroundTint="#ffffff"
                 android:layout_marginBottom="16dp" />
@@ -79,7 +80,7 @@
                 android:id="@+id/deadlineInputText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Fecha de pago"
+                android:hint="Fecha de pago *"
                 android:backgroundTint="#ffffff"
                 android:onClick="openDatePicker"
                 android:focusableInTouchMode="true"
@@ -87,13 +88,30 @@
                 android:layout_marginBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/categories_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ms_alwaysShowFloatingLabel="true"
+            app:ms_hint="Categoría *"
+            app:ms_floatingLabelText="Categoría"/>
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/reminders_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ms_alwaysShowFloatingLabel="true"
+            app:ms_hint="Frecuencia de recordatorios *"
+            app:ms_floatingLabelText="Frecuencia de recordatorios"
+            android:layout_marginTop="16dp"/>
+
         <TextView
             android:id="@+id/remindersLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tipo de recordatorio"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="10dp"
             android:textSize="12dp" />
 
@@ -113,24 +131,8 @@
             android:id="@+id/smsCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
+            android:layout_marginBottom="16dp"
             android:text="SMS" />
-
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/reminders_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:ms_alwaysShowFloatingLabel="true"
-            app:ms_hint="Frecuencia de recordatorios"
-            app:ms_floatingLabelText="Frecuencia de recordatorios"
-            android:layout_marginTop="16dp"/>
-
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/categories_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:ms_alwaysShowFloatingLabel="true"
-            app:ms_hint="Categoría"
-            app:ms_floatingLabelText="Categoría"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/transactionSubmitBtn"

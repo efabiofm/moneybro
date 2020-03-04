@@ -2,14 +2,15 @@ package com.innovant.moneybro;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 public class TransactionActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
+    private ScrollView formScroll;
 
     private TextView userSelectedText;
     private TextInputEditText deadlineInput;
@@ -64,14 +66,17 @@ public class TransactionActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private QuerySnapshot usuarios;
     private SearchableDialog buscadorUsuarios;
-    private int userSelectedIndex;
+    private int userSelectedIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction);
         setTitle("Nueva transacción");
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         mAuth = FirebaseAuth.getInstance();
+        formScroll = findViewById(R.id.transaction_scrollview);
 
         deadlineInput = findViewById(R.id.deadlineInputText);
         moneyInput = findViewById(R.id.moneyInputText);
@@ -90,21 +95,9 @@ public class TransactionActivity extends AppCompatActivity {
         pushCheckbox = findViewById(R.id.pushCheckbox);
         smsCheckbox = findViewById(R.id.smsCheckbox);
 
-        builder = MaterialDatePicker.Builder.datePicker();
-        constraintsBuilder = new CalendarConstraints.Builder();
-        builder.setCalendarConstraints(constraintsBuilder.build());
-        picker = builder.build();
-        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
-            @Override
-            public void onPositiveButtonClick(Object selection) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                Long dateLong = Long.parseLong(selection.toString());
-                String dateString = formatter.format(new Date(dateLong));
-                deadlineInput.setText(dateString);
-            }
-        });
-
         botonCrear = findViewById(R.id.transactionSubmitBtn);
+        interestInput.setText("0");
+
         db = FirebaseFirestore.getInstance();
         db.collection("users").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -114,6 +107,29 @@ public class TransactionActivity extends AppCompatActivity {
                         initSearchBar();
                     }
                 });
+        initDatePicker();
+    }
+
+    private void initDatePicker() {
+        builder = MaterialDatePicker.Builder.datePicker();
+        constraintsBuilder = new CalendarConstraints.Builder();
+        builder.setCalendarConstraints(constraintsBuilder.build());
+        picker = builder.build();
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+                deadlineInput.setError(null);
+            }
+        });
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                Long dateLong = Long.parseLong(selection.toString());
+                String dateString = formatter.format(new Date(dateLong));
+                deadlineInput.setText(dateString);
+            }
+        });
     }
 
     private void initSearchBar() {
@@ -127,6 +143,7 @@ public class TransactionActivity extends AppCompatActivity {
             @Override
             public void onClick(int i, SearchListItem searchListItem) {
                 userSelectedText.setText(searchListItem.getTitle());
+                userSelectedText.setTextColor(Color.BLACK);
                 userSelectedIndex = i;
                 buscadorUsuarios.dismiss();
             }
@@ -151,20 +168,32 @@ public class TransactionActivity extends AppCompatActivity {
 
     public void crearTransaccion(View view) {
         Map<String, Object> transaccion = getObjetoTransaccion();
-        botonCrear.setEnabled(false);
-        guardarTransaccionFirebase(transaccion);
+        if (transaccion != null) {
+            botonCrear.setEnabled(false);
+            guardarTransaccionFirebase(transaccion);
+        }
     }
 
     private Map<String, Object> getObjetoTransaccion() {
-        String tipoTransaccion = transactionSpinner.getSelectedItem().toString();
-        int monto = Integer.parseInt(moneyInput.getText().toString());
-        int interes = Integer.parseInt(interestInput.getText().toString());
+        Object tipoTransaccionItem = transactionSpinner.getSelectedItem();
+        String montoText = moneyInput.getText().toString();
+        Object categoriaItem = categoriesSpinner.getSelectedItem();
+        Object frecuenciaItem = remindersSpinner.getSelectedItem();
+
+        if (!isFormValid(tipoTransaccionItem, montoText, categoriaItem, frecuenciaItem)) {
+            return null;
+        }
+
+        String tipoTransaccion = tipoTransaccionItem.toString();
+        int monto = Integer.parseInt(montoText);
         Long fecha = Long.parseLong(picker.getSelection().toString());
+        String categoria = categoriaItem.toString();
+        String interesText = interestInput.getText().toString();
+        int interes = interesText.isEmpty() ? 0 : Integer.parseInt(interesText);
         boolean valorEmailCheckbox = Boolean.parseBoolean(emailCheckbox.getText().toString());
         boolean valorPushCheckbox = Boolean.parseBoolean(pushCheckbox.getText().toString());
         boolean valorSmsCheckbox = Boolean.parseBoolean(smsCheckbox.getText().toString());
         String frecuenciaRecordatorios = remindersSpinner.getSelectedItem().toString();
-        String categoria = categoriesSpinner.getSelectedItem().toString();
         String creatorId = mAuth.getCurrentUser().getUid();
         String receiverId = usuarios.getDocuments().get(userSelectedIndex).getId();
 
@@ -215,5 +244,36 @@ public class TransactionActivity extends AppCompatActivity {
                     botonCrear.setEnabled(true);
                 }
             });
+    }
+
+    public boolean isFormValid(Object tipoTransaccion, String monto, Object categoria, Object frecuencia) {
+        Long hoy = new Date().getTime();
+        if (userSelectedIndex == -1) {
+            userSelectedText.setTextColor(Color.RED);
+            formScroll.fullScroll(ScrollView.FOCUS_UP);
+            return false;
+        }
+        if (tipoTransaccion == null) {
+            ((TextView) transactionSpinner.getSelectedView()).setError("Tipo requerido");
+            formScroll.fullScroll(ScrollView.FOCUS_UP);
+            return false;
+        }
+        if (monto.isEmpty() || Integer.parseInt(monto) <= 0) {
+            moneyInput.setError("Monto inválido");
+            return false;
+        }
+        if (deadlineInput.getText().toString().isEmpty() || Long.parseLong(picker.getSelection().toString()) < hoy) {
+            deadlineInput.setError("Fecha inválida");
+            return false;
+        }
+        if (categoria == null) {
+            ((TextView) categoriesSpinner.getSelectedView()).setError("Categoría requerida");
+            return false;
+        }
+        if (frecuencia == null) {
+            ((TextView) remindersSpinner.getSelectedView()).setError("Frecuencia requerida");
+            return false;
+        }
+        return true;
     }
 }
