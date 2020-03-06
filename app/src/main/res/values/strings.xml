@@ -5,6 +5,7 @@
         <item>Deuda</item>
     </string-array>
     <string-array name="reminders_frequency">
+        <item>Nunca</item>
         <item>1 vez al día</item>
         <item>Cada 3 días</item>
         <item>Cada semana</item>

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import android.util.Log;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -23,6 +22,7 @@ import android.content.Intent;
 import android.view.Menu;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private TextView noData;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         noData = findViewById(R.id.noDataText);
         noData.setVisibility(View.GONE);
+
+        progressBar = findViewById(R.id.progressBarHome);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,6 +72,7 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
                             final List<Map<String, Object>> transacciones = new ArrayList<>();
                             for(QueryDocumentSnapshot doc : task.getResult()) {
@@ -116,6 +120,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private Intent createDetailsIntent(Map<String, Object> transaction) {
         Intent details = new Intent(HomeActivity.this, TransactionDetailsActivity.class);
+        int monto = Integer.parseInt(transaction.get("amount").toString());
+        int interes = Integer.parseInt(transaction.get("interest").toString());
         details.putExtra("id", transaction.get("id").toString());
         details.putExtra("creatorId", transaction.get("creatorId").toString());
         details.putExtra("receiverId", transaction.get("receiverId").toString());
@@ -124,7 +130,7 @@ public class HomeActivity extends AppCompatActivity {
         details.putExtra("receiverName", transaction.get("receiverName").toString());
         details.putExtra("state", transaction.get("state").toString());
         details.putExtra("deadline", Utils.formatDate(transaction.get("deadline")));
-        details.putExtra("amount", transaction.get("amount").toString());
+        details.putExtra("amount", "" + Utils.calcInterest(monto, interes));
         details.putExtra("category", transaction.get("category").toString());
         return details;
     }

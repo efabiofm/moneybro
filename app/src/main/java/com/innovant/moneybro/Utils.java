@@ -20,4 +20,9 @@ public class Utils {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
         return dateFormat.format(fecha);
     }
+
+
+    public static int calcInterest(int number, int interest) {
+        return number + (number * interest) / 100;
+    }
 }

@@ -10,6 +10,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +35,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText passConfirmField;
     private EditText emailField;
     private EditText passwordField;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,9 @@ public class SignupActivity extends AppCompatActivity {
         passConfirmField = findViewById(R.id.signupPassConfirmField);
         emailField = findViewById(R.id.signupEmailField);
         passwordField = findViewById(R.id.signupPassField);
+        progressBar = findViewById(R.id.progressBarSignup);
+
+        progressBar.setVisibility(View.GONE);
     }
 
     public void signup(View view) {
@@ -58,11 +63,14 @@ public class SignupActivity extends AppCompatActivity {
 
         if (isFormValid()) {
             signupBtn.setEnabled(false);
+            progressBar.setVisibility(View.VISIBLE);
 
             mAuth.createUserWithEmailAndPassword(emailValue, passwordValue)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        signupBtn.setEnabled(true);
+                        progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
                             FirebaseInstanceId.getInstance().getInstanceId()
                                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {

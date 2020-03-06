@@ -3,48 +3,42 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/transaction_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp">
+    app:titleTextColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         tools:context=".TransactionActivity">
-
-        <com.mancj.materialsearchbar.MaterialSearchBar
-            android:id="@+id/searchBar"
-            style="@style/MaterialSearchBarLight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:mt_hint="Ingrese el nombre"
-            app:mt_maxSuggestionsCount="10"
-            app:mt_placeholder="Buscar usuario"
-            app:mt_speechMode="false"/>
 
         <TextView
             android:id="@+id/userLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Usuario"
-            android:layout_marginLeft="13dp"
-            android:layout_marginBottom="13dp"/>
+            android:text="Enviar a *"
+            android:textSize="12dp"
+            android:layout_marginLeft="10dp" />
         <TextView
             android:id="@+id/userSelected"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sin seleccionar"
-            android:textSize="18dp"
-            android:layout_marginLeft="13dp"/>
+            android:text="Toca para seleccionar"
+            android:layout_marginLeft="10dp"
+            android:textColor="#000"
+            android:textSize="16dp"
+            android:layout_marginBottom="16dp"/>
 
         <fr.ganfra.materialspinner.MaterialSpinner
             android:id="@+id/transactions_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:ms_alwaysShowFloatingLabel="true"
-            app:ms_hint="Tipo de transacción"
+            app:ms_hint="Tipo de transacción *"
             app:ms_floatingLabelText="Tipo de transacción"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -56,9 +50,10 @@
                 android:id="@+id/moneyInputText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Monto"
+                android:hint="Monto *"
                 android:inputType="number"
-                android:backgroundTint="#ffffff"/>
+                android:backgroundTint="#ffffff"
+                android:layout_marginBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -72,7 +67,8 @@
                 android:layout_height="match_parent"
                 android:hint="Interés"
                 android:inputType="number"
-                android:backgroundTint="#ffffff"/>
+                android:backgroundTint="#ffffff"
+                android:layout_marginBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -84,61 +80,67 @@
                 android:id="@+id/deadlineInputText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Fecha de pago"
+                android:hint="Fecha de pago *"
                 android:backgroundTint="#ffffff"
                 android:onClick="openDatePicker"
                 android:focusableInTouchMode="true"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:layout_marginBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/remindersLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tipo de recordatorio"
-            android:layout_marginLeft="13dp"
-            android:layout_marginTop="13dp"/>
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/emailCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Correo electrónico" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/pushCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notificaciones Push" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/smsCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SMS" />
-
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/reminders_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:ms_alwaysShowFloatingLabel="true"
-            app:ms_hint="Frecuencia de recordatorios"
-            app:ms_floatingLabelText="Frecuencia de recordatorios"/>
 
         <fr.ganfra.materialspinner.MaterialSpinner
             android:id="@+id/categories_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:ms_alwaysShowFloatingLabel="true"
-            app:ms_hint="Categoría"
+            app:ms_hint="Categoría *"
             app:ms_floatingLabelText="Categoría"/>
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/reminders_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ms_alwaysShowFloatingLabel="true"
+            app:ms_hint="Frecuencia de recordatorios *"
+            app:ms_floatingLabelText="Frecuencia de recordatorios"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/remindersLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de recordatorio"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="12dp" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/emailCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Correo electrónico" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/pushCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Notificaciones Push" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/smsCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginBottom="16dp"
+            android:text="SMS" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/transactionSubmitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Crear transacción"
-            android:onClick="crearTransaccion"/>
+            android:onClick="crearTransaccion"
+            android:layout_marginBottom="32dp"/>
 
     </LinearLayout>
 </ScrollView>

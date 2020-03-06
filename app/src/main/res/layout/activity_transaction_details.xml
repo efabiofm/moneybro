@@ -6,17 +6,16 @@
     android:layout_margin="16dp">
 
     <TextView
+        android:id="@+id/tdStateLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Estado" />
+
+    <TextView
         android:id="@+id/tdState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
-
-    <TextView
-        android:id="@+id/tdType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="24dp"
-        android:textStyle="bold"
         android:layout_marginBottom="16dp"
         android:text="" />
 
