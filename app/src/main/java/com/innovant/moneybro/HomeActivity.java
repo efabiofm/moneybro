@@ -6,11 +6,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -181,6 +179,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 mAuth.signOut();
                 Toast.makeText(HomeActivity.this, "Sesión finalizada", Toast.LENGTH_LONG).show();
                 startActivity(new Intent(HomeActivity.this, MainActivity.class));
+                break;
+            case R.id.nav_history:
+                startActivity(new Intent(HomeActivity.this, HistoryActivity.class));
                 break;
         }
         return false;

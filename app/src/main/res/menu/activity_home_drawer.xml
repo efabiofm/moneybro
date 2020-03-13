@@ -14,6 +14,11 @@
             android:title="Profile"/>
 
         <item
+            android:id="@+id/nav_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Historial"/>
+
+        <item
             android:id="@+id/nav_logout"
             android:icon="@android:drawable/ic_lock_power_off"
             android:title="Cerrar sesión"/>
