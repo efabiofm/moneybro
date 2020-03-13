@@ -23,6 +23,9 @@
             android:name=".SignupActivity"
             android:screenOrientation="sensorPortrait" />
         <activity
+            android:name=".ProfileActivity"
+            android:screenOrientation="sensorPortrait" />
+        <activity
             android:name=".MainActivity"
             android:screenOrientation="sensorPortrait">
             <intent-filter>

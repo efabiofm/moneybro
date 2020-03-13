@@ -1,5 +1,6 @@
 package com.innovant.moneybro.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.innovant.moneybro.HomeActivity;
+import com.innovant.moneybro.MainActivity;
 import com.innovant.moneybro.R;
 
 import java.util.ArrayList;
