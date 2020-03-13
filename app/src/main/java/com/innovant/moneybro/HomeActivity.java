@@ -27,8 +27,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.view.Menu;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +49,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private TextView navHeaderEmail;
     private ProgressBar progressBar;
     private DrawerLayout drawer;
+    private Spinner filterSpinner;
+    private Context context = this;
+    private List<Map<String, Object>> transacciones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,15 +66,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         progressBar = findViewById(R.id.progressBarHome);
         listView = findViewById(R.id.transactions_list);
 
-        final Context context = this;
-
         db.collection("transactions").whereArrayContains("showTo", mAuth.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            final List<Map<String, Object>> transacciones = new ArrayList<>();
+                            transacciones = new ArrayList<>();
                             for(QueryDocumentSnapshot doc : task.getResult()) {
                                 Map<String, Object> transaccion = doc.getData();
                                 String state = transaccion.get("state").toString();
@@ -78,8 +81,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                     transacciones.add(transaccion);
                                 }
                             }
-                            CustomAdapter customAdapter = new CustomAdapter(context, transacciones);
-                            listView.setAdapter(customAdapter);
                             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -90,10 +91,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                             if (transacciones.size() == 0) {
                                 noData.setVisibility(View.VISIBLE);
                             }
+
+                            setupFilterSpinner();
+
                         }
                     }
                 });
-
         setupNavDrawer();
     }
 
@@ -181,5 +184,48 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         return false;
+    }
+
+    private void setupFilterSpinner() {
+        filterSpinner = findViewById(R.id.filterSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.filter_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(adapter);
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (transacciones.size() > 0) {
+                    CustomAdapter ca;
+                    switch (position) {
+                        case 0:
+                            ca = new CustomAdapter(context, transacciones);
+                            listView.setAdapter(ca);
+                            break;
+                        case 1:
+                            ca = new CustomAdapter(context, filtrarTransacciones("Préstamo"));
+                            listView.setAdapter(ca);
+                        case 2:
+                            ca = new CustomAdapter(context, filtrarTransacciones("Deuda"));
+                            listView.setAdapter(ca);
+                        default:
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private List<Map<String, Object>> filtrarTransacciones(String criterio) {
+        List<Map<String, Object>> listaFiltrada = new ArrayList<>();
+        for (Map<String, Object> t : transacciones) {
+            if (t.get("type").equals(criterio)) {
+                listaFiltrada.add(t);
+            }
+        }
+        return listaFiltrada;
     }
 }

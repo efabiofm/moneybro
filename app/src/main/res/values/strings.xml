@@ -34,4 +34,10 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+
+    <string-array name="filter_options">
+        <item>Todos</item>
+        <item>Préstamos</item>
+        <item>Deudas</item>
+    </string-array>
 </resources>
