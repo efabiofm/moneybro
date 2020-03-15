@@ -205,9 +205,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         case 1:
                             ca = new CustomAdapter(context, filtrarTransacciones("Préstamo"));
                             listView.setAdapter(ca);
+                            break;
                         case 2:
                             ca = new CustomAdapter(context, filtrarTransacciones("Deuda"));
                             listView.setAdapter(ca);
+                            break;
                         default:
                     }
                 }
