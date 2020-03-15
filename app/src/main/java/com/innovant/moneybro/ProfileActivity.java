@@ -3,8 +3,11 @@ package com.innovant.moneybro;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.Continuation;
@@ -31,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView perfilEmail;
     private TextView perfilPrestamos;
     private TextView perfilDeudas;
+    private Map<String, Object> user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +58,9 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            String nombre = task.getResult().getData().get("name").toString();
-                            String email = task.getResult().getData().get("email").toString();
+                            user = task.getResult().getData();
+                            String nombre = user.get("name").toString();
+                            String email = user.get("email").toString();
                             perfilNombre.setText(nombre);
                             perfilEmail.setText(email);
                         }
@@ -82,20 +87,12 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 });
-//        Map<String, Object> params = new HashMap<>();
-//        params.put("userId", uid);
-//        mFunctions
-//                .getHttpsCallable("getTotalUserTransactions")
-//                .call(params)
-//                .continueWith(new Continuation<HttpsCallableResult, Object>() {
-//                    @Override
-//                    public Object then(@NonNull Task<HttpsCallableResult> task) {
-//                        if (task.isSuccessful()) {
-//                            Object data = task.getResult().getData();
-//                            Log.d("Result", data.toString());
-//                        }
-//                        return null;
-//                    }
-//                });
+    }
+
+    public void editarPerfil(View v) {
+        Intent intent = new Intent(ProfileActivity.this, ProfileDetailsActivity.class);
+        intent.putExtra("name", user.get("name").toString());
+        intent.putExtra("phone", user.get("phone").toString());
+        startActivity(intent);
     }
 }

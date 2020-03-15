@@ -8,7 +8,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HistoryActivity"></activity>
+        <activity android:name=".ProfileDetailsActivity"></activity>
+        <activity android:name=".HistoryActivity" />
         <activity android:name=".TransactionDetailsActivity" />
         <activity android:name=".TransactionActivity" />
         <activity
