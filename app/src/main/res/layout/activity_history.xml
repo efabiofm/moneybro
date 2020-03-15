@@ -6,15 +6,53 @@
     android:layout_height="match_parent"
     tools:context=".HistoryActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/inicioInput"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:hint="Fecha inicio"
+            android:onClick="setFechaInicio"/>
+
+        <EditText
+            android:id="@+id/finInput"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:hint="Fecha fin"
+            android:onClick="setFechaFin"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#ddd"
+            android:focusable="false"
+            android:textColor="@color/colorDark"
+            android:text="Filtrar"
+            android:onClick="filtrar"/>
+    </LinearLayout>
+
     <ListView
         android:id="@+id/history_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="603dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0" />
 
     <View
         android:layout_width="match_parent"

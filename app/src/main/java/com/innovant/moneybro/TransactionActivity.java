@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class TransactionActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -124,6 +125,7 @@ public class TransactionActivity extends AppCompatActivity {
             @Override
             public void onPositiveButtonClick(Object selection) {
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
                 Long dateLong = Long.parseLong(selection.toString());
                 String dateString = formatter.format(new Date(dateLong));
                 deadlineInput.setText(dateString);
